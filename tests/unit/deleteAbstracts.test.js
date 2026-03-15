@@ -130,6 +130,17 @@ if (typeof describe === 'function' && typeof it === 'function') {
 } else {
   console.log('Running delete abstracts tests without test framework...');
 
+  const deleteAbstractFromItem = async function(item) {
+    let currentAbstract = item.getField("abstractNote");
+    if (currentAbstract) {
+      item.setField("abstractNote", "");
+      await item.saveTx();
+      return { deleted: true };
+    } else {
+      return { deleted: false };
+    }
+  };
+
   async function runDeleteAbstractsTests() {
     console.log('\n=== Delete Abstracts Tests ===');
     let passed = 0;
@@ -139,9 +150,8 @@ if (typeof describe === 'function' && typeof it === 'function') {
     const item1 = new Zotero.Item(1);
     item1.setField("abstractNote", "This is a test abstract.");
     item1.setField("title", "Test Paper");
-    item1.setField("abstractNote", "");
-    const hasNoAbstract = item1.getField("abstractNote") === "";
-    if (hasNoAbstract) {
+    const result1 = await deleteAbstractFromItem(item1);
+    if (result1.deleted && item1.getField("abstractNote") === "") {
       console.log('✓ 1. Deletes abstract from item');
       passed++;
     } else {
@@ -156,6 +166,18 @@ if (typeof describe === 'function' && typeof it === 'function') {
       passed++;
     } else {
       console.log('✗ 2. Other fields were modified');
+      failed++;
+    }
+
+    // Test 3: Skip item without abstract
+    const item2 = new Zotero.Item(1);
+    item2.setField("title", "No Abstract Paper");
+    const result2 = await deleteAbstractFromItem(item2);
+    if (!result2.deleted) {
+      console.log('✓ 3. Skips item without abstract');
+      passed++;
+    } else {
+      console.log('✗ 3. Should have skipped item without abstract');
       failed++;
     }
 
