@@ -104,6 +104,14 @@ Zotadata = {
                 Zotadata.findSelectedFiles();
             });
 
+            let deleteAbstracts = _create(doc, "menuitem");
+            deleteAbstracts.id = "zotero-itemmenu-zotadata-delete-abstracts";
+            deleteAbstracts.setAttribute("label", "Delete Abstracts");
+            deleteAbstracts.addEventListener("command", () => {
+                this.log("Delete Abstracts menu item clicked");
+                Zotadata.deleteAbstractsFromSelectedItems();
+            });
+
             let separator = _create(doc, "menuseparator");
             separator.id = "zotero-itemmenu-zotadata-separator";
 
@@ -119,6 +127,7 @@ Zotadata = {
             itemmenupopup.appendChild(fetchMetadata);
             itemmenupopup.appendChild(processArxiv);
             itemmenupopup.appendChild(findFiles);
+            itemmenupopup.appendChild(deleteAbstracts);
             itemmenupopup.appendChild(separator);
             itemmenupopup.appendChild(preferences);
             itemmenu.appendChild(itemmenupopup);
@@ -131,6 +140,7 @@ Zotadata = {
                 this.storeAddedElement(fetchMetadata);
                 this.storeAddedElement(processArxiv);
                 this.storeAddedElement(findFiles);
+                this.storeAddedElement(deleteAbstracts);
                 this.storeAddedElement(separator);
                 this.storeAddedElement(preferences);
                 this.log("Successfully added menu to window");
@@ -2943,6 +2953,86 @@ Zotadata = {
             } catch (alertError) {
                 this.log("Could not show error alert: " + alertError);
             }
+        }
+    },
+
+    // Delete abstract field from selected items
+    async deleteAbstractsFromSelectedItems() {
+        this.log("deleteAbstractsFromSelectedItems called");
+        let selectedItems = Zotero.getActiveZoteroPane().getSelectedItems();
+        this.log("Selected items count: " + selectedItems.length);
+
+        if (!selectedItems.length) {
+            this.log("No items selected");
+            this.showDialog('Please select items to delete abstracts from.');
+            return;
+        }
+
+        // Filter to regular items (not attachments, notes, etc.)
+        let regularItems = selectedItems.filter(item => item.isRegularItem());
+
+        if (!regularItems.length) {
+            this.showDialog('No regular items selected.\nPlease select library items (not attachments or notes).');
+            return;
+        }
+
+        this.log(`Processing ${regularItems.length} regular items`);
+
+        let batchResult = await this.processBatch(
+            regularItems,
+            (item) => this.deleteAbstractFromItem(item),
+            {
+                batchSize: 10,
+                delayBetweenBatches: 50,
+                progressTitle: "Deleting Abstracts",
+                progressThreshold: 10
+            }
+        );
+
+        if (!batchResult.success) {
+            this.showDialog("Error during abstract deletion: " + batchResult.error);
+            return;
+        }
+
+        // Count how many abstracts were actually deleted
+        let deletedCount = 0;
+        let skippedCount = 0;
+        for (let result of batchResult.results) {
+            if (result.result && result.result.deleted) {
+                deletedCount++;
+            } else {
+                skippedCount++;
+            }
+        }
+
+        let customLines = [
+            `🗑️ Abstracts deleted: ${deletedCount}`,
+            `⏭️ Items without abstract: ${skippedCount}`
+        ];
+
+        this.showGenericBatchSummary(
+            batchResult,
+            "🗑️ Delete Abstracts Results",
+            customLines
+        );
+    },
+
+    // Delete abstract from a single item
+    async deleteAbstractFromItem(item) {
+        try {
+            let currentAbstract = item.getField("abstractNote");
+            if (currentAbstract) {
+                this.log(`Deleting abstract from item ${item.id}`);
+                item.setField("abstractNote", "");
+                await item.saveTx();
+                return { deleted: true };
+            } else {
+                this.log(`Item ${item.id} has no abstract, skipping`);
+                return { deleted: false };
+            }
+        } catch (error) {
+            this.log(`Error deleting abstract from item ${item.id}: ${error}`);
+            throw error;
         }
     },
 
