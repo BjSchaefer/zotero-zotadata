@@ -19,15 +19,14 @@
 
         updateProgress: function(percent, message) {
           document.getElementById('progress-meter').value = percent;
-          document.getElementById('progress-meter').max = 100;
           document.getElementById('progress-description').textContent = message;
         },
 
         setItemStatus: function(itemTitle, status) {
           let table = document.getElementById('items-table-body');
-          let row = document.createElementNS('http://www.w3.org/1999/xhtml', 'html:tr');
-          let cell1 = document.createElementNS('http://www.w3.org/1999/xhtml', 'html:td');
-          let cell2 = document.createElementNS('http://www.w3.org/1999/xhtml', 'html:td');
+          let row = document.createElementNS('http://www.w3.org/1999/xhtml', 'tr');
+          let cell1 = document.createElementNS('http://www.w3.org/1999/xhtml', 'td');
+          let cell2 = document.createElementNS('http://www.w3.org/1999/xhtml', 'td');
 
           cell1.textContent = itemTitle;
           cell2.textContent = status;
