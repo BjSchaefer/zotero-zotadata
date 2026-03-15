@@ -327,10 +327,7 @@ export class MenuManager {
    * Create DOM element with attributes
    */
   private createElement(tagName: string, attributes: Record<string, any>): Element {
-    const element = document.createElementNS(
-      'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
-      tagName
-    );
+    const element = document.createXULElement(tagName);
 
     for (const [key, value] of Object.entries(attributes)) {
       if (key === 'oncommand' && typeof value === 'function') {

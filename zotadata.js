@@ -2,14 +2,7 @@
 Zotero.log("Zotadata: Script loading started");
 
 function _create(doc, name) {
-    const elt =
-        Zotero.platformMajorVersion >= 102
-            ? doc.createXULElement(name)
-            : doc.createElementNS(
-                "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
-                name
-            );
-    return elt;
+    return doc.createXULElement(name);
 }
 
 /*

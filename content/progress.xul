@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 
-<dialog id="zotadata-progress"
-        title="&zotadata.progress.title;"
+<window id="zotadata-progress"
+        title="Zotadata Progress"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        buttons="cancel"
+        xmlns:html="http://www.w3.org/1999/xhtml"
         width="500"
         height="300">
 
@@ -19,29 +19,30 @@
 
         updateProgress: function(percent, message) {
           document.getElementById('progress-meter').value = percent;
-          document.getElementById('progress-description').value = message;
+          document.getElementById('progress-description').textContent = message;
         },
 
         setItemStatus: function(itemTitle, status) {
-          let listbox = document.getElementById('items-listbox');
-          let listitem = document.createElement('listitem');
-          let cell1 = document.createElement('listcell');
-          let cell2 = document.createElement('listcell');
+          let table = document.getElementById('items-table-body');
+          let row = document.createElementNS('http://www.w3.org/1999/xhtml', 'tr');
+          let cell1 = document.createElementNS('http://www.w3.org/1999/xhtml', 'td');
+          let cell2 = document.createElementNS('http://www.w3.org/1999/xhtml', 'td');
 
-          cell1.setAttribute('label', itemTitle);
-          cell2.setAttribute('label', status);
+          cell1.textContent = itemTitle;
+          cell2.textContent = status;
 
-          listitem.appendChild(cell1);
-          listitem.appendChild(cell2);
-          listbox.appendChild(listitem);
+          row.appendChild(cell1);
+          row.appendChild(cell2);
+          table.appendChild(row);
 
           // Scroll to bottom
-          listbox.scrollTop = listbox.scrollHeight;
+          let container = document.getElementById('items-container');
+          container.scrollTop = container.scrollHeight;
         },
 
         cancel: function() {
           this.canceled = true;
-          document.getElementById('progress-description').value = "Canceling...";
+          document.getElementById('progress-description').textContent = "Canceling...";
         }
       };
 
@@ -52,28 +53,33 @@
   </script>
 
   <vbox flex="1">
-    <description id="progress-description" value="Starting..."/>
+    <html:div id="progress-description" style="margin: 5px 0;">Starting...</html:div>
 
-    <progressmeter id="progress-meter"
-                   mode="determined"
+    <html:progress id="progress-meter"
                    value="0"
-                   style="margin: 10px 0;"/>
+                   max="100"
+                   style="width: 100%; margin: 10px 0;"/>
 
     <groupbox flex="1">
-      <caption label="&zotadata.progress.items;"/>
+      <label><html:h3>Items</html:h3></label>
 
-      <listbox id="items-listbox" flex="1">
-        <listhead>
-          <listheader label="&zotadata.progress.item;"/>
-          <listheader label="&zotadata.progress.status;"/>
-        </listhead>
-      </listbox>
+      <html:div id="items-container" style="overflow-y: auto; flex: 1; max-height: 200px;">
+        <html:table style="width: 100%; border-collapse: collapse;">
+          <html:thead>
+            <html:tr>
+              <html:th style="text-align: left;">Item</html:th>
+              <html:th style="text-align: left;">Status</html:th>
+            </html:tr>
+          </html:thead>
+          <html:tbody id="items-table-body"/>
+        </html:table>
+      </html:div>
     </groupbox>
 
     <hbox pack="end">
-      <button label="&zotadata.progress.cancel;"
+      <button label="Cancel"
               oncommand="ZotadataProgress.cancel(); window.close();"/>
     </hbox>
   </vbox>
 
-</dialog> 
+</window> 

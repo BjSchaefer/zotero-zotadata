@@ -1,6 +1,10 @@
-const { classes: Cc, interfaces: Ci, utils: Cu } = Components;
-
-Cu.import("resource://gre/modules/Services.jsm");
+// Zotero 7 (Firefox 115) and Zotero 8 (Firefox 128+) compatible bootstrap
+// Services is a global in Firefox 128+; for Firefox 115 we import the ESModule
+if (typeof Services === "undefined") {
+    var { Services } = ChromeUtils.importESModule(
+        "resource://gre/modules/Services.sys.mjs"
+    );
+}
 
 var Zotadata;
 
@@ -13,21 +17,22 @@ function startup({ id, version, rootURI }, reason) {
     Zotadata.addToAllWindows();
 
     // Listen for new windows
-    var wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
     var windowListener = {
         onOpenWindow: function(xulWindow) {
-            var window = xulWindow.QueryInterface(Ci.nsIInterfaceRequestor)
-                                  .getInterface(Ci.nsIDOMWindow);
-            window.addEventListener("load", function() {
-                if (window.ZoteroPane) {
-                    Zotadata.addToWindow(window);
+            // Use docShell.domWindow (works in both Firefox 115 and 128+)
+            var domWindow = xulWindow.docShell?.domWindow;
+            if (!domWindow) return;
+
+            domWindow.addEventListener("load", function() {
+                if (domWindow.ZoteroPane) {
+                    Zotadata.addToWindow(domWindow);
                 }
             }, false);
         },
         onCloseWindow: function(xulWindow) {},
         onWindowTitleChange: function(xulWindow, newTitle) {}
     };
-    wm.addListener(windowListener);
+    Services.wm.addListener(windowListener);
 
     // Store reference to remove later
     Zotadata.windowListener = windowListener;
@@ -47,8 +52,7 @@ function shutdown(data, reason) {
 
         // Remove window listener
         if (Zotadata.windowListener) {
-            var wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
-            wm.removeListener(Zotadata.windowListener);
+            Services.wm.removeListener(Zotadata.windowListener);
         }
 
         // Close any open progress windows
