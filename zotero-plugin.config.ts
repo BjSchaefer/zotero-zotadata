@@ -19,7 +19,7 @@ export default defineConfig({
           __env__: `"${process.env.NODE_ENV || "development"}"`,
         },
         bundle: true,
-        target: "firefox115",
+        target: "firefox128",
         outfile: `.scaffold/dist/addon/chrome/content/scripts/${pkg.config.addonRef}.js`,
       },
     ],

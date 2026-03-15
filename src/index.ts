@@ -234,12 +234,7 @@ class ZotadataPlugin {
     name: string,
     attributes: Record<string, string> = {}
   ): Element {
-    const element = Zotero.platformMajorVersion >= 102
-      ? doc.createXULElement(name)
-      : doc.createElementNS(
-          'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
-          name
-        );
+    const element = doc.createXULElement(name);
 
     for (const [key, value] of Object.entries(attributes)) {
       element.setAttribute(key, value);

@@ -15,7 +15,7 @@ fi
 VERSION="$1"
 XPI_NAME="${PLUGIN_NAME}-${VERSION}.xpi"
 
-echo "Building ${PLUGIN_NAME} v${VERSION} for Zotero 7..."
+echo "Building ${PLUGIN_NAME} v${VERSION} for Zotero 7/8..."
 
 # Remove existing XPI
 if [ -f "${XPI_NAME}" ]; then
@@ -48,7 +48,7 @@ if [ $? -eq 0 ]; then
     echo "4. Select ${XPI_NAME}"
     echo "5. Restart Zotero"
     echo ""
-    echo "Note: This extension is compatible with Zotero 7.x only"
+    echo "Note: This extension is compatible with Zotero 7.x and 8.x"
 else
     echo "Error: Failed to create XPI package"
     exit 1

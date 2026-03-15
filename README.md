@@ -2,7 +2,7 @@
 
 A Zotero plugin that enhances your research workflow with intelligent metadata discovery and automated file management.
 
-**⚠️ This version is specifically designed for Zotero 7.x and will not work with Zotero 6.x**
+**⚠️ This version is specifically designed for Zotero 7.x and 8.x and will not work with Zotero 6.x**
 
 ## Demo
 
@@ -60,7 +60,7 @@ This diagram was inspired by [this Reddit post](https://www.reddit.com/r/coolgui
 
 ## Installation
 
-### From XPI File (Zotero 7.x)
+### From XPI File (Zotero 7.x / 8.x)
 
 1. Download the latest release XPI file
 2. In Zotero 7, go to `Tools` → `Add-ons`
@@ -68,7 +68,7 @@ This diagram was inspired by [this Reddit post](https://www.reddit.com/r/coolgui
 4. Select the downloaded XPI file
 5. Restart Zotero
 
-**Note**: This extension requires Zotero 7.0 or later. For Zotero 6.x compatibility, use an earlier version of this extension.
+**Note**: This extension requires Zotero 7.0 or later (including Zotero 8.x). For Zotero 6.x compatibility, use an earlier version of this extension.
 
 ### Manual Installation (Development)
 
@@ -210,8 +210,8 @@ zotero-zotadata/
 ### Requirements
 
 - Node.js (for build tools and dependencies)
-- Zotero 7.0 or later
-- Firefox 115+ based platform
+- Zotero 7.0 or later (including 8.x)
+- Firefox 115+ based platform (Firefox 128+ for Zotero 8)
 
 ### Setup
 
@@ -223,28 +223,28 @@ zotero-zotadata/
 
 1. Make changes to the source files
 2. Run `./build.sh` to create XPI package
-3. Test in Zotero 7 development environment
+3. Test in Zotero 7/8 development environment
 
 ### Testing
 
 - Unit test the API integration functions
 - Test with various item types and DOI formats
 - Verify UI responsiveness and error handling
-- Test with both Zotero 7 stable and beta versions
+- Test with both Zotero 7/8 stable and beta versions
 
-## Zotero 7 Migration
+## Zotero 7/8 Migration
 
-This version has been completely rewritten for Zotero 7 compatibility:
+This version has been completely rewritten for Zotero 7 and 8 compatibility:
 
 - **Extension Format**: Migrated from `install.rdf` to `manifest.json`
 - **Architecture**: Changed from XUL overlays to bootstrapped extension
 - **APIs**: Updated to use Zotero 7 compatible APIs
-- **Window Management**: Adapted to new Zotero 7 window lifecycle
+- **Window Management**: Adapted to new Zotero 7/8 window lifecycle
 - **Preferences**: Moved to root-level `prefs.js` file
 
-## Zotero 7 Compatibility Notes
+## Zotero 7/8 Compatibility Notes
 
-When developing this plugin for Zotero 7, ensure the following in your `manifest.json`:
+When developing this plugin for Zotero 7/8, ensure the following in your `manifest.json`:
 
 - **`manifest_version`**: Must be set to `2`. Despite Zotero 7 being based on a newer Firefox core that uses Manifest V3 for web extensions, Zotero's own bootstrapped plugins still expect `manifest_version: 2`.
 - **`applications` key**: Zotero-specific properties (like `id`, `strict_min_version`, `strict_max_version`, and `update_url`) must be within an `applications.zotero` object.
@@ -258,7 +258,7 @@ Failure to include `update_url` will result in an error message in the Zotero de
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test thoroughly with Zotero 7
+4. Test thoroughly with Zotero 7 and 8
 5. Submit a pull request
 
 ## License
